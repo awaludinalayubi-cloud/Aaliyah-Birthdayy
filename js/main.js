@@ -94,100 +94,48 @@
 
   document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
-  /* ---------- Photo wall ---------- */
-  var STORAGE_KEY = 'aaliyah-photos';
-  var photos = [];
-  try { photos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { photos = []; }
+  /* ---------- Photo wall (permanent local photos) ---------- */
+  var PHOTOS = [
+    'img/aliyah.jpg',
+    'img/aliyah1.jpg', 'img/aliyah2.jpg', 'img/aliyah3.jpg',
+    'img/aliyah4.jpg', 'img/aliyah5.jpg', 'img/aliyah6.jpg',
+    'img/aliyah7.jpg', 'img/aliyah8.jpg', 'img/aliyah11.jpg',
+    'img/aliyah13.jpg', 'img/aliyah14.jpg', 'img/aliyah16.jpg',
+    'img/aliyah17.jpg', 'img/aliyah9.jpg', 'img/aliyah20.jpg',
+    'img/aliyah21.jpg', 'img/aliyah22.jpg', 'img/aliyah23.jpg',
+    'img/aliyah24.jpg', 'img/aliyah25.jpg', 'img/aliyah26.jpg'
+  ];
+
+  var CAPTIONS = [
+    'The sweetest smile ✨', 'Hello sunshine 🌸', 'Pretty in pink 💗',
+    'Little dreamer ⭐', 'Twinkle, twinkle 🎀', 'Pure joy 😊',
+    'Charming as always 🧸', 'Cuteness overload 🍭', 'Sweetest girl 🎂',
+    'Golden moments 🌟', 'Simply beautiful 🌷', 'Happiness unlocked 🎉',
+    'Laughter & love ❤️', 'Our little star 🌟', 'Shining bright ✨',
+    'Memories forever 📸', 'Heart of gold 💛', 'Positively pretty 🦋',
+    'Gorgeous girl 🌺', 'Smile that glows 💕', 'Cherished moments 🎈',
+    'with daddy ✨'
+  ];
 
   var grid = $('#photoGrid');
-  var dropzone = $('#dropzone');
-  var fileInput = $('#fileInput');
-
-  function savePhotos() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(photos.slice(0, 40)));
-    } catch (e) { /* storage full — keep in memory */ }
-  }
-
-  function esc(s) {
-    return (s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
 
   function renderGrid() {
     grid.innerHTML = '';
-    if (!photos.length) {
-      var hint = document.createElement('div');
-      hint.className = 'polaroid empty-hint';
-      hint.textContent = 'No photos yet — add the first one above! 🎀';
-      grid.appendChild(hint);
-      return;
-    }
-    photos.forEach(function (photo, i) {
+    PHOTOS.forEach(function (src, i) {
       var card = document.createElement('figure');
       card.className = 'polaroid';
-      card.style.setProperty('--rot', photo.rot + 'deg');
+      card.style.setProperty('--rot', Math.round(Math.random() * 10 - 5) + 'deg');
       card.innerHTML =
         '<span class="tape"></span>' +
-        '<img src="' + photo.src + '" alt="Birthday photo ' + (i + 1) + '">' +
+        '<img src="' + src + '" alt="Moment ' + (i + 1) + '" loading="lazy">' +
         '<figcaption>' +
-        '<input class="caption" value="' + esc(photo.caption) + '" placeholder="Write something cute…" aria-label="Caption">' +
-        '<button class="delete" aria-label="Remove photo">&times;</button>' +
+        '<p class="caption-static">' + (CAPTIONS[i] || 'A beautiful moment 💖') + '</p>' +
         '</figcaption>';
 
-      card.querySelector('img').addEventListener('click', function () { openLightbox(i); });
-      card.querySelector('.delete').addEventListener('click', function (e) {
-        e.stopPropagation();
-        photos.splice(i, 1);
-        renderGrid();
-        savePhotos();
-      });
-      card.querySelector('.caption').addEventListener('input', function (e) {
-        photo.caption = e.target.value;
-        savePhotos();
-      });
+      card.querySelector('img').addEventListener('click', function () { openLightbox(src); });
       grid.appendChild(card);
     });
   }
-
-  function addPhotos(files) {
-    var pending = 0;
-    Array.prototype.forEach.call(files, function (file) {
-      if (!file.type || file.type.indexOf('image/') !== 0) return;
-      pending++;
-      var reader = new FileReader();
-      reader.onload = function () {
-        photos.push({
-          src: reader.result,
-          caption: '',
-          rot: Math.round(Math.random() * 10 - 5)
-        });
-        pending--;
-        renderGrid();
-        savePhotos();
-        if (pending === 0) burst(60);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  ['dragenter', 'dragover'].forEach(function (ev) {
-    dropzone.addEventListener(ev, function (e) {
-      e.preventDefault();
-      dropzone.classList.add('drag');
-    });
-  });
-  ['dragleave', 'drop'].forEach(function (ev) {
-    dropzone.addEventListener(ev, function (e) {
-      e.preventDefault();
-      dropzone.classList.remove('drag');
-    });
-  });
-  dropzone.addEventListener('drop', function (e) { addPhotos(e.dataTransfer.files); });
-  $('#pickBtn').addEventListener('click', function () { fileInput.click(); });
-  fileInput.addEventListener('change', function () {
-    addPhotos(fileInput.files);
-    fileInput.value = '';
-  });
 
   renderGrid();
 
@@ -281,9 +229,9 @@
   var lightbox = $('#lightbox');
   var lbImg = $('#lbImg');
 
-  function openLightbox(i) {
-    if (!photos[i]) return;
-    lbImg.src = photos[i].src;
+  function openLightbox(src) {
+    if (!src) return;
+    lbImg.src = src;
     lightbox.hidden = false;
     document.body.style.overflow = 'hidden';
   }
