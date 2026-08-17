@@ -113,7 +113,7 @@
     'Golden moments 🌟', 'Simply beautiful 🌷', 'Happiness unlocked 🎉',
     'Laughter & love ❤️', 'Our little star 🌟', 'Shining bright ✨',
     'Memories forever 📸', 'Heart of gold 💛', 'Positively pretty 🦋',
-    'Gorgeous girl 🌺', 'Smile that glows 💕', 'With Mommy 💕',
+    'Gorgeous girl 🌺', 'Smile that glows ✨', 'With Mommy 💕',
     'with daddy ✨'
   ];
 
